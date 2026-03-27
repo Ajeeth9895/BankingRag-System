@@ -38,7 +38,7 @@ public class RagConfig {
                 .user("postgres")
                 .password("postgres")
                 .table("embeddings")
-                .dimension(768) // ✅ matches DB
+                .dimension(768) //matches DB
                 .build();
     }
 

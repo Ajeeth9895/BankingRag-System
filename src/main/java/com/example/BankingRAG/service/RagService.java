@@ -73,7 +73,7 @@ public class RagService {
 
                 @Override
                 public void onComplete(Response<AiMessage> response) {
-                    emitter.complete(); // ✅ ONLY HERE
+                    emitter.complete(); //ONLY HERE
                 }
 
                 @Override
