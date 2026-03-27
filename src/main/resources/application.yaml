@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: BankingRAG
+
+  thymeleaf:
+    cache: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ragdb
+    username: postgres
+    password: postgres
+
+    jpa:
+      hibernate:
+        ddl-auto: update

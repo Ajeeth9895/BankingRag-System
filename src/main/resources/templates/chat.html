@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Banking Assistant</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #343541;
+            margin: 0;
+            color: white;
+        }
+
+        /* ===== HEADER ===== */
+        #header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #1f2937, #111827);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        #header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        #header .logo {
+            font-size: 26px;
+            margin-right: 10px;
+        }
+
+        #header .title h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        #header .title span {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        #status {
+            font-size: 12px;
+            color: #22c55e;
+        }
+
+        /* ===== CHAT ===== */
+        #chat {
+            width: 60%;
+            margin: 20px auto;
+            background: #444654;
+            padding: 20px;
+            border-radius: 10px;
+            height: 450px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 75%;
+            white-space: pre-wrap;
+        }
+
+        .user {
+            background: #4a90e2;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot {
+            background: #2f2f3a;
+            margin-right: auto;
+        }
+
+        /* ===== INPUT ===== */
+        #inputArea {
+            width: 60%;
+            margin: 10px auto;
+            display: flex;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 12px;
+            margin-left: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #19c37d;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #16a34a;
+        }
+
+        /* ===== TYPING CURSOR ===== */
+        .cursor {
+            display: inline-block;
+            width: 6px;
+            background: white;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 🔥 HEADER -->
+<div id="header">
+    <div id="header-left">
+        <div class="logo">🏦</div>
+        <div class="title">
+            <h2>ABC Banking Assistant</h2>
+            <span>Your AI Financial Helper</span>
+        </div>
+    </div>
+    <div id="status">● Online</div>
+</div>
+
+<!-- CHAT -->
+<div id="chat"></div>
+
+<!-- INPUT -->
+<div id="inputArea">
+    <input type="text" id="query" placeholder="Ask about loans, interest, EMI..." />
+    <button onclick="send()">Send</button>
+</div>
+
+<script>
+    function send() {
+        const queryInput = document.getElementById("query");
+        const query = queryInput.value.trim();
+
+        if (!query) return;
+
+        const chat = document.getElementById("chat");
+
+        // USER MESSAGE
+        const userDiv = document.createElement("div");
+        userDiv.className = "message user";
+        userDiv.innerText = query;
+        chat.appendChild(userDiv);
+
+        // BOT MESSAGE
+        const botDiv = document.createElement("div");
+        botDiv.className = "message bot";
+        botDiv.innerHTML = "<span class='text'></span><span class='cursor'></span>";
+        chat.appendChild(botDiv);
+
+        const textSpan = botDiv.querySelector(".text");
+
+        // ✅ FIXED: backticks added
+        const eventSource = new EventSource(`/rag/stream?query=${encodeURIComponent(query)}`);
+
+        eventSource.onmessage = function(event) {
+            let token = event.data;
+
+            // newline fix
+            token = token.replace(/\n/g, "<br>");
+
+            if ([".", ",", "%", "?", "!", ":"].includes(token.trim())) {
+                textSpan.innerHTML += token;
+            } else {
+                textSpan.innerHTML += " " + token;
+            }
+
+            chat.scrollTop = chat.scrollHeight;
+        };
+
+        eventSource.onerror = function() {
+            eventSource.close();
+
+            // remove cursor
+            const cursor = botDiv.querySelector(".cursor");
+            if (cursor) cursor.remove();
+        };
+
+        queryInput.value = "";
+    }
+    document.getElementById("query").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        send();
+    }
+});
+</script>
+
+</body>
+</html>

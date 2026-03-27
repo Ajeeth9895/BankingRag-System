@@ -1,0 +1,15 @@
+Loan Details Document
+Loan ID: LN123456
+Customer Name: Ajeeth Kumar
+Loan Type: Personal Loan
+Loan Amount: ?5,00,000
+Interest Rate: 10.5% per annum
+Loan Tenure: 5 years
+EMI Amount: ?10,748
+Start Date: 01-Jan-2026
+End Date: 01-Jan-2031
+Bank Name: ABC Bank
+Status: Active
+
+Description:
+This loan is issued for personal financial needs. The borrower agrees to repay the loan in monthly installments (EMI) over the specified tenure with applicable interest.
